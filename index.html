@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>United Dredging — Social Media Calendar</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f0f2f5;color:#1a1a2e;min-height:100vh;}
+.topbar{background:#1a1a2e;padding:16px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+.topbar-left{display:flex;align-items:center;gap:14px;}
+.logo{width:40px;height:40px;background:#0073ea;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.topbar h1{color:#fff;font-size:17px;font-weight:700;}
+.topbar p{color:#8892b0;font-size:13px;}
+.nav-btns{display:flex;align-items:center;gap:8px;}
+.nav-btn{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;}
+.nav-btn:hover{background:rgba(255,255,255,0.15);}
+.month-label{color:#fff;font-size:16px;font-weight:700;min-width:160px;text-align:center;}
+.toggles-bar{background:#fff;border-bottom:1px solid #e8eaf0;padding:12px 28px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.toggles-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-right:4px;}
+.tog{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid transparent;transition:all 0.15s;user-select:none;}
+.tog.on{border-color:currentColor;}
+.tog.off{opacity:.38;border-color:transparent;background:#f4f5f7!important;color:#aaa!important;}
+.tog .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0;}
+.special-bar{background:#f8f9fc;border-bottom:1px solid #e8eaf0;padding:10px 28px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.special-bar-label{font-size:12px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-right:4px;}
+.add-special-btn{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px dashed;transition:all 0.15s;background:transparent;font-family:'DM Sans',sans-serif;}
+.add-special-btn:hover{opacity:.8;}
+.cal-wrap{padding:24px 28px;}
+.cal-header{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px;}
+.cal-dow{text-align:center;font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;padding:6px 0;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day{background:#fff;border-radius:10px;min-height:120px;padding:8px;border:1px solid #e8eaf0;position:relative;}
+.cal-day.empty{background:transparent;border-color:transparent;}
+.cal-day.today{border:2px solid #0073ea;}
+.day-num{font-size:12px;font-weight:600;color:#888;margin-bottom:5px;}
+.cal-day.today .day-num{color:#0073ea;}
+.post-pill{border-radius:6px;padding:4px 6px;margin-bottom:3px;cursor:pointer;transition:opacity 0.15s;}
+.post-pill:hover{opacity:.8;}
+.post-pill-label{font-size:10px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.post-pill-sub{font-size:9px;opacity:.75;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal{background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:28px;}
+.modal-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:20px;}
+.modal-badge{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;display:inline-block;}
+.modal-close{background:none;border:none;cursor:pointer;font-size:22px;color:#888;line-height:1;padding:0;}
+.modal-date{font-size:13px;color:#888;margin-top:4px;}
+.modal h2{font-size:18px;font-weight:700;color:#1a1a2e;}
+.modal-section{margin-top:16px;}
+.modal-section label{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:6px;}
+.caption-box{background:#f8f9fc;border-radius:10px;padding:14px;font-size:13px;line-height:1.7;color:#1a1a2e;border:1px solid #e8eaf0;min-height:80px;}
+.platforms-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.plat-chip{padding:4px 10px;background:#f0f2f5;border-radius:20px;font-size:11px;font-weight:600;color:#555;}
+.cap-counter{font-size:11px;color:#aaa;margin-top:6px;text-align:right;}
+.copy-btn{margin-top:12px;width:100%;padding:10px;background:#0073ea;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;}
+.copy-btn:hover{background:#005ec7;}
+.copy-btn.copied{background:#00c875;}
+.regen-btn{margin-top:8px;width:100%;padding:10px;background:#fff;color:#0073ea;border:1.5px solid #0073ea;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.regen-btn:hover{background:#f0f7ff;}
+.del-btn{margin-top:8px;width:100%;padding:10px;background:#fff;color:#e2445c;border:1.5px solid #e2445c;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s;}
+.del-btn:hover{background:#fdedf0;}
+.media-zone{border:1.5px dashed #d0d7e5;border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-top:6px;position:relative;}
+.media-zone:hover{border-color:#0073ea;background:#f5f9ff;}
+.media-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.media-zone-label{font-size:13px;color:#888;pointer-events:none;}
+.media-zone-label span{display:block;font-size:20px;margin-bottom:4px;}
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;}
+.media-thumb{position:relative;border-radius:8px;overflow:hidden;aspect-ratio:1;background:#f0f2f5;}
+.media-thumb img,.media-thumb video{width:100%;height:100%;object-fit:cover;}
+.media-thumb-del{position:absolute;top:4px;right:4px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.media-filename{font-size:10px;color:#555;text-align:center;padding:4px 4px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dl-btn{margin-top:8px;width:100%;padding:10px;background:#1a1a2e;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;}
+.dl-btn:hover{background:#2d2d4e;}
+.dl-btn:disabled{background:#ccc;cursor:default;}
+.media-count{font-size:11px;color:#0073ea;font-weight:600;margin-top:6px;}
+.form-group{margin-bottom:14px;}
+.form-group label{font-size:12px;font-weight:600;color:#555;display:block;margin-bottom:5px;}
+.form-group input,.form-group select,.form-group textarea{width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid #e0e3eb;font-size:13px;font-family:'DM Sans',sans-serif;color:#1a1a2e;outline:none;transition:border 0.2s;background:#fff;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#0073ea;}
+.form-group textarea{resize:vertical;min-height:70px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.submit-btn{width:100%;padding:11px;background:#0073ea;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;margin-top:4px;}
+.submit-btn:hover{background:#005ec7;}
+.legend{display:flex;flex-wrap:wrap;gap:8px;padding:0 28px 16px;}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:11px;color:#666;}
+.leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo">
+      <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" stroke="white" stroke-width="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div>
+      <h1>United Dredging — Social Media Calendar</h1>
+      <p>Click any post to view and copy the caption</p>
+    </div>
+  </div>
+  <div class="nav-btns">
+    <button class="nav-btn" onclick="changeMonth(-1)">&#8592; Prev</button>
+    <span class="month-label" id="month-label"></span>
+    <button class="nav-btn" onclick="changeMonth(1)">Next &#8594;</button>
+  </div>
+</div>
+
+<div class="toggles-bar" id="toggles-bar"><span class="toggles-label">Post types:</span></div>
+
+<div class="special-bar">
+  <span class="special-bar-label">Add:</span>
+  <button class="add-special-btn" style="color:#e91e8c;border-color:#e91e8c;" onclick="openAddModal('birthday')">&#127874; Birthday</button>
+  <button class="add-special-btn" style="color:#7c4dff;border-color:#7c4dff;" onclick="openAddModal('anniversary')">&#127942; Work Anniversary</button>
+  <button class="add-special-btn" style="color:#00897b;border-color:#00897b;" onclick="openAddModal('corevalue')">&#11088; Core Value Nominee</button>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div class="cal-wrap">
+  <div class="cal-header">
+    <div class="cal-dow">Sun</div><div class="cal-dow">Mon</div><div class="cal-dow">Tue</div>
+    <div class="cal-dow">Wed</div><div class="cal-dow">Thu</div><div class="cal-dow">Fri</div>
+    <div class="cal-dow">Sat</div>
+  </div>
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<!-- View/Edit Caption Modal -->
+<div class="modal-bg" id="modal-bg" onclick="closeCaptionModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div id="modal-badge" class="modal-badge"></div>
+        <h2 id="modal-title" style="margin-top:8px;"></h2>
+        <div class="modal-date" id="modal-date"></div>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('modal-bg').classList.remove('open')">&#215;</button>
+    </div>
+    <div id="modal-platforms-wrap" class="modal-section">
+      <label>Platforms</label>
+      <div class="platforms-row" id="modal-platforms"></div>
+    </div>
+    <div class="modal-section">
+      <label>Caption</label>
+      <div class="caption-box" id="modal-caption"></div>
+      <div class="cap-counter" id="cap-counter"></div>
+      <button class="copy-btn" id="copy-btn" onclick="copyCaption()">Copy caption</button>
+      <button class="regen-btn" id="regen-btn" onclick="regenCaption()">&#8635; Generate new caption</button>
+      <button class="del-btn" id="del-btn" style="display:none;" onclick="deleteSpecial()">&#128465; Remove this post</button>
+    </div>
+    <div class="modal-section">
+      <label>Attach media <span style="font-weight:400;text-transform:none;font-size:11px;color:#aaa;">(photos &amp; videos for this post)</span></label>
+      <div class="media-zone" id="media-zone">
+        <input type="file" id="media-input" multiple accept="image/*,video/*" onchange="handleMediaUpload(event)">
+        <div class="media-zone-label"><span>&#128247;</span>Drop files here or click to upload<br><span style="font-size:11px;color:#bbb;">JPG, PNG, GIF, MP4, MOV supported</span></div>
+      </div>
+      <div class="media-count" id="media-count" style="display:none;"></div>
+      <div class="media-grid" id="media-grid"></div>
+      <button class="dl-btn" id="dl-btn" onclick="downloadPost()" disabled>&#8595; Download post package</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Special Post Modal -->
+<div class="modal-bg" id="add-modal-bg" onclick="closeAddModal(event)">
+  <div class="modal" id="add-modal">
+    <div class="modal-header">
+      <div>
+        <div id="add-modal-badge" class="modal-badge"></div>
+        <h2 id="add-modal-title" style="margin-top:8px;"></h2>
+      </div>
+      <button class="modal-close" onclick="document.getElementById('add-modal-bg').classList.remove('open')">&#215;</button>
+    </div>
+    <div id="add-modal-body"></div>
+  </div>
+</div>
+
+<script>
+const TYPES=[
+  {key:'newsletter',label:'Newsletter',day:1,color:'#0073ea',bg:'#e6f2ff',text:'#004aad',platforms:['Facebook','Instagram','TikTok','X'],captions:["Your weekly dose of United Dredging news is here! From job site updates to team highlights — catch up on everything happening this week. Link in bio. #UnitedDredging #CompanyNewsletter #TeamUpdate","This week's newsletter is live! Stay in the loop on what's happening across our projects and crew. Don't miss it — link in bio. #UnitedDredging #WeeklyUpdate","Another week, another packed newsletter from the United Dredging team! Head to the link in bio to catch all this week's updates. #UnitedDredging #Newsletter #TeamNews","The weekly newsletter is out! From the water to the work site — everything you need to know is inside. Link in bio. #UnitedDredging #WeeklyRecap","Big week at United Dredging — and the newsletter covers it all. Click the link in bio to read up! #UnitedDredging #Newsletter #CompanyUpdate","Don't miss this week's United Dredging newsletter! Packed with project updates, team news, and more. Link in bio. #UnitedDredging #WeeklyNews","Fresh newsletter alert! Catch the latest from United Dredging — project highlights, crew shoutouts, and what's coming up. Link in bio. #UnitedDredging #Newsletter","The monthly wrap-up newsletter is live! Everything we've accomplished and what's ahead — link in bio. #UnitedDredging #MonthlyRecap","Your Monday just got better — the United Dredging newsletter dropped! Catch up on everything from the past week. Link in bio. #UnitedDredging #MondayNewsletter","Stay connected to what's happening at United Dredging! This week's newsletter is packed with project updates. Link in bio. #UnitedDredging #Newsletter","We put together this week's newsletter so you never miss a beat at United Dredging. Link in bio! #UnitedDredging #WeeklyUpdate","From the field to the office — this week's United Dredging newsletter covers it all. Read it at the link in bio! #UnitedDredging #Newsletter","It's newsletter day at United Dredging! Check out what our team has been up to this week. Link in bio. #UnitedDredging #NewsletterDay","Another great week in the books — it's all in this week's newsletter. Link in bio! #UnitedDredging #WeeklyWrap","The United Dredging newsletter is your weekly inside look at our projects, people, and progress. Link in bio. #UnitedDredging #Newsletter","We love keeping our community in the know! This week's newsletter is live — link in bio. #UnitedDredging #CommunityUpdate","New week, new newsletter. United Dredging has been busy — read all about it at the link in bio! #UnitedDredging #NewWeek","Our newsletter is the best way to stay up to date with United Dredging. This week's edition is live — link in bio! #UnitedDredging #StayUpdated","We had an incredible week and we're sharing all of it in this week's newsletter. Link in bio! #UnitedDredging #WeekInReview","Exciting things are happening at United Dredging! Get the full scoop in this week's newsletter — link in bio. #UnitedDredging #ExcitingNews","The team has been hard at work and this week's newsletter shows it. Read it at the link in bio! #UnitedDredging #HardWork","Monday morning means one thing — the United Dredging newsletter! Your weekly update is ready. Link in bio. #UnitedDredging #MondayMotivation","Keeping you in the loop is our priority. This week's United Dredging newsletter is live — link in bio! #UnitedDredging #InTheLoop","Another edition of the United Dredging newsletter is here! From project milestones to team moments — link in bio. #UnitedDredging #Milestones","We put our best stories, updates, and news into every newsletter. This week's is no different — link in bio! #UnitedDredging #BestStories"]},
+  {key:'jobsite',label:'Job Site Photo',day:2,color:'#e2445c',bg:'#fdedf0',text:'#991028',platforms:['Instagram','Facebook'],captions:["Another day, another project moving forward. Our crew shows up and gets it done — no matter the conditions. #UnitedDredging #DredgingLife #JobSite #HeavyEquipment","The work doesn't stop. Proud of this team and everything they do out on the water every single day. #UnitedDredging #Dredging #CrewLife #HardWork","Behind every finished project is a team that gave it everything. This is what we do at United Dredging. #UnitedDredging #JobSite #TeamWork #BuiltDifferent","From sunrise to sundown, this crew delivers. Another incredible day out on site. #UnitedDredging #DredgingLife #ConstructionCrew","No two days look the same out here — and we love that. This is life at United Dredging. #UnitedDredging #CrewLife #WaterWork","The job doesn't wait and neither do we. Another productive day in the field for the United Dredging crew. #UnitedDredging #JobSite #HardWorkPaysOff","These are the people who make it happen every day. Proud of our crew and everything they accomplish. #UnitedDredging #DredgingLife #TeamWork","Progress looks like this. Our team working hard to get every project done right. #UnitedDredging #JobSite #BuiltToLast","Out on the water and getting it done. The United Dredging crew never slows down. #UnitedDredging #WaterWork #DredgingLife","This is what dedication looks like. Our crew giving everything they've got on every single project. #UnitedDredging #Dedication #HardWork","Big equipment. Bigger team. The United Dredging crew in action. #UnitedDredging #HeavyEquipment #DredgingLife","Every project tells a story and our crew writes it with hard work every day. #UnitedDredging #ProjectLife #DredgingLife","Rain or shine, the United Dredging team is on the job. Grateful for this crew every single day. #UnitedDredging #RainOrShine #DredgingLife","The work speaks for itself. Another day of progress on site with the United Dredging crew. #UnitedDredging #WorkSpeaks #JobSite","You can't replicate this kind of teamwork. Proud of what our crew built today. #UnitedDredging #Teamwork #DredgingLife","Heavy equipment and harder workers — that's United Dredging on the job site every day. #UnitedDredging #HeavyEquipment #HardWorkers","The water is our office and we wouldn't have it any other way. United Dredging crew representing! #UnitedDredging #WaterOffice #DredgingLife","Early mornings. Long days. Great results. This is the United Dredging way. #UnitedDredging #EarlyMornings #DredgingLife","Every job site is different. Every crew member brings something special. That's what makes United Dredging great. #UnitedDredging #UniqueTeam","Captured on site — another day of excellence from the United Dredging crew. #UnitedDredging #OnSite #Excellence","The grind never stops at United Dredging. Our crew is always pushing forward on every project. #UnitedDredging #TheGrind #DredgingLife","We don't just get the job done — we get it done right. United Dredging crew delivering quality every day. #UnitedDredging #QualityWork","Out here making waves — literally. The United Dredging team hard at work on the water. #UnitedDredging #MakingWaves #WaterWork","Another milestone reached on site. This is what the United Dredging crew is made of. #UnitedDredging #Milestone #DredgingLife","Day in, day out — the United Dredging crew shows up with energy, focus, and results. Proud of every one of them. #UnitedDredging #DayInDayOut #CrewLife"]},
+  {key:'spotlight',label:'Employee Spotlight',day:3,color:'#784bd1',bg:'#f0eafc',text:'#3d1f8a',platforms:['Facebook','Instagram','TikTok'],captions:["This week we're shining the spotlight on one of our amazing team members! [Name] has been with United Dredging for [X years] and brings something special to every project. We're lucky to have them! #UnitedDredging #EmployeeSpotlight #TeamAppreciation","Meet the people behind the projects! [Name] is one of the hardest working members of our crew and today we're giving them the recognition they deserve. #UnitedDredging #SpotlightSeries #TeamLife","Great companies are built by great people. [Name] is a true asset to the United Dredging family. Drop a comment to show them some love! #UnitedDredging #EmployeeSpotlight #CompanyCulture","Every project we complete is a team effort — and [Name] is a huge part of that. So grateful to have them on the crew. #UnitedDredging #TeamAppreciation #EmployeeSpotlight","Today we're celebrating [Name]! Their dedication and work ethic inspire everyone around them at United Dredging. #UnitedDredging #EmployeeSpotlight #ProudEmployer","The United Dredging team is built on people like [Name] — reliable, hardworking, and always showing up. Thank you! #UnitedDredging #SpotlightSeries #TeamRecognition","We talk a lot about our work — today we want to talk about our people. [Name], you are what makes United Dredging great. #UnitedDredging #EmployeeSpotlight #PeopleComeFirst","Behind every great project is a great team. This week we're celebrating [Name] and the incredible work they do every day. #UnitedDredging #TeamSpotlight","United Dredging wouldn't be what it is without people like [Name]. Today we celebrate their contributions. #UnitedDredging #EmployeeSpotlight #Grateful","Spotlight time! [Name] has been a cornerstone of our crew and we want the world to know how much they mean to us. #UnitedDredging #CrewSpotlight #TeamLove","We believe in celebrating our people — and [Name] deserves all the recognition today. Thank you for your hard work! #UnitedDredging #EmployeeSpotlight #ThankYou","From day one, [Name] has been an incredible part of our United Dredging family. So proud to have them on our team! #UnitedDredging #TeamFamily #EmployeeSpotlight","Today's spotlight is on [Name] — someone who goes above and beyond every single day. We see you and we appreciate you! #UnitedDredging #AboveAndBeyond","What makes United Dredging special? People like [Name]. Today we're giving them the shoutout they've earned. #UnitedDredging #EmployeeSpotlight","Behind the hard hats and heavy equipment are people who truly care. [Name] is one of those people. #UnitedDredging #BehindTheHelmet #EmployeeSpotlight","Consistency, dedication, and heart — that's [Name] at United Dredging. We're honored to work alongside them. #UnitedDredging #TeamValues #EmployeeSpotlight","Every team needs a [Name]. We're thankful ours has them. Happy to celebrate this incredible person today! #UnitedDredging #Thankful #CrewLife","Good people make good companies. [Name] is proof of that every single day at United Dredging. #UnitedDredging #GoodPeople #EmployeeSpotlight","We're shining a light on [Name] this week — a valued member of our team who makes United Dredging a better workplace. #UnitedDredging #ShiningALight","It takes a special kind of person to do what [Name] does every day. Proud to call them part of the United Dredging family. #UnitedDredging #SpecialPeople","Today's spotlight goes to [Name] — someone whose positive attitude and strong work ethic lift the whole team up. #UnitedDredging #PositiveAttitude","The backbone of United Dredging is our people — and [Name] is a perfect example of the quality that defines our team. #UnitedDredging #TeamBackbone","Recognizing greatness when we see it! [Name] brings so much value to United Dredging and today we say: THANK YOU. #UnitedDredging #RecognizingGreatness","We asked the team what they love most about working with [Name] and the answers were overwhelming. You are truly one of a kind! #UnitedDredging #OneOfAKind","This week's spotlight shines on [Name]. Their passion, skill, and commitment to excellence make our entire crew better. We're lucky to have you! #UnitedDredging #PassionAndSkill"]},
+  {key:'video',label:'Short Video',day:4,color:'#ff642e',bg:'#fff0ea',text:'#8a2700',platforms:['TikTok','Instagram','Facebook'],captions:["Ever wonder what dredging actually looks like up close? Watch this. #UnitedDredging #Dredging #HeavyMachinery #ConstructionTok #JobSiteLife","A day in the life at United Dredging — from the water to the job site, this is what we do. #UnitedDredging #DayInTheLife #DredgingLife #ConstructionTok","This machine does WHAT?! Watch our crew put it to work. #UnitedDredging #HeavyEquipment #DredgingTok #MachineryLovers","Work hard. Work smart. Work with the best team in the industry. #UnitedDredging #TeamWork #DredgingLife #ConstructionCrew","POV: You're on a United Dredging job site. This is what a day looks like. #UnitedDredging #ConstructionTok #DredgingLife #BehindTheScenes","Not your average office view. Check out what our crew gets to see every day. #UnitedDredging #DredgingLife #OfficeView #ConstructionTok","The equipment. The crew. The work. This is United Dredging. #UnitedDredging #HeavyEquipment #Dredging #MachineryTok","You asked for a behind-the-scenes look — here it is. A real day at United Dredging. #UnitedDredging #BTS #ConstructionLife #DredgingTok","Watch how our crew handles this — pure skill and teamwork on display. #UnitedDredging #PureSkill #DredgingTok #ConstructionLife","If you've never seen a dredge in action, this is your moment. Absolutely incredible to watch. #UnitedDredging #DredgeInAction #MachineryTok","This is why we love what we do. Watch the United Dredging crew work their magic. #UnitedDredging #LoveWhatWeDo #DredgingTok","Big machines, bigger results. Watch the United Dredging crew in action on today's project. #UnitedDredging #BigMachines #DredgingLife","We filmed a day on the water and the footage speaks for itself. This is United Dredging. #UnitedDredging #OnTheWater #DredgingLife","The sound of progress — that's what you hear at every United Dredging job site. Watch and listen! #UnitedDredging #SoundOfProgress","Our crew makes this look easy — trust us, it isn't. This takes real skill. #UnitedDredging #RealSkill #DredgingTok #ConstructionLife","Ever seen water move like this? Our equipment does it every day. #UnitedDredging #WaterWork #HeavyEquipment #DredgingTok","Satisfying doesn't even begin to cover it. Watch the United Dredging crew do their thing. #UnitedDredging #Satisfying #DredgingLife","We documented everything that went into today's project — watch the full clip! #UnitedDredging #BehindTheWork #DredgingTok","From setup to execution — this is how United Dredging handles a project. Watch and be amazed. #UnitedDredging #FromStartToFinish #DredgingTok","Teamwork makes the dream work — and this video is proof. United Dredging crew showing out! #UnitedDredging #Teamwork #DredgingTok","People always ask what we do — now you can see for yourself. This is United Dredging in action. #UnitedDredging #NowYouKnow #DredgingLife","Machines this powerful require operators this skilled. Watch our team handle it like pros. #UnitedDredging #SkilledOperators #HeavyEquipment","If you love heavy equipment, this one's for you. United Dredging crew putting the big machines to work! #UnitedDredging #HeavyEquipmentLovers","Another incredible shot from the United Dredging job site. This crew never disappoints. #UnitedDredging #JobSiteLife #DredgingTok","Watch what happens when experience meets the right equipment. This is the United Dredging difference. #UnitedDredging #TheDifference #DredgingTok"]},
+  {key:'perk',label:'Employee Perk',day:5,color:'#00c875',bg:'#e6faf2',text:'#005c35',platforms:['Facebook','Instagram','X'],captions:["We invest in our people — even their playlists! United Dredging covers your Audible account so you can listen on the road, at home, or anywhere in between. Want perks like this? Join our team! #UnitedDredging #EmployeePerks #NowHiring","Great pay. Great team. Great perks. At United Dredging, we take care of the people who take care of our projects. Interested in joining us? Link in bio. #UnitedDredging #NowHiring #WorkCulture","Yes, we have a book club — and yes, United Dredging pays for your Audible account to go with it. Want in? Come join us! #UnitedDredging #BookClub #EmployeePerks #NowHiring","The best part of working at United Dredging? The people and the perks. Think you'd be a good fit? #UnitedDredging #JoinOurTeam #WorkPerks #NowHiring","At United Dredging, we don't just offer jobs — we offer careers with real perks. Paid Audible, book club, and a team that has your back. #UnitedDredging #EmployeeBenefits #NowHiring","Did you know United Dredging pays for your Audible subscription? Whether you're commuting or winding down — we've got your listening covered. #UnitedDredging #Audible #EmployeePerks","Work perks that actually matter — that's United Dredging. We cover your Audible account because we believe in continuous learning. #UnitedDredging #EmployeePerks #NowHiring","Proud to be a company that invests in its people. Our team enjoys great benefits — including a paid Audible account. Come grow with us! #UnitedDredging #TeamBenefits #NowHiring","Your commute just got a whole lot better. United Dredging pays for your Audible account so every drive is time well spent. Join our team! #UnitedDredging #CommutePerk #Audible","We believe a company is only as good as the people in it — and we treat our people that way. Paid Audible, book club, and so much more. #UnitedDredging #CompanyCulture #NowHiring","Fun fact: United Dredging pays for your Audible account. Because we believe learning should never stop. Come join us! #UnitedDredging #FunFact #EmployeePerks #NowHiring","Looking for a company that actually invests in you? United Dredging offers real perks — including a fully paid Audible account. Link in bio! #UnitedDredging #RealPerks #NowHiring","At United Dredging, every team member gets access to Audible — because we believe our crew deserves to grow. Apply today! #UnitedDredging #GrowWithUs #Audible #NowHiring","Books, audiobooks, and a crew that supports your growth — that's United Dredging. Our perks go beyond the paycheck. #UnitedDredging #BeyondThePaycheck #NowHiring","We cover your Audible. We have a book club. And we're hiring. Join a team that's invested in your growth! #UnitedDredging #InvestedInYou #NowHiring","Our employees don't just work here — they thrive here. Paid Audible is just one of the ways we show our team we care. #UnitedDredging #ThriveHere #EmployeePerks","Here's a perk you don't hear about often: United Dredging pays for your Audible account. Great teams deserve great benefits. #UnitedDredging #UnheardOfPerk #Audible","We want our crew listening, learning, and growing — so we cover the Audible subscription. That's the United Dredging way. #UnitedDredging #ListenLearnGrow #EmployeePerks","The road is long — but with a United Dredging-paid Audible account, it flies by. Join a team that actually cares! #UnitedDredging #RoadReady #Audible #NowHiring","Perks that make a difference. United Dredging covers Audible for every team member because we value our people's growth. #UnitedDredging #PerksWithPurpose #Audible","We pay for your Audible so you can keep growing on and off the clock. That's the United Dredging commitment. #UnitedDredging #AlwaysGrowing #EmployeePerks #NowHiring","From book club to paid Audible — United Dredging is serious about investing in our team's growth. Come grow with us! #UnitedDredging #SeriousAboutGrowth #NowHiring","Our team members get more than a paycheck — a fully covered Audible account, a book club, and a crew that supports them. Join United Dredging! #UnitedDredging #MoreThanAPaycheck","United Dredging fun fact: we pay for your Audible account. Because knowledge is power and our team deserves both. #UnitedDredging #KnowledgeIsPower #Audible","We don't just say we value our people — we prove it. Paid Audible, a thriving book club, and a culture you'll love. Now hiring! #UnitedDredging #WeProveIt #NowHiring"]},
+  {key:'engagement',label:'Engagement Post',day:6,color:'#f5a623',bg:'#fff8e6',text:'#7a4f00',platforms:['X','Instagram'],captions:["Industry trivia: Did you know dredging has been used for thousands of years to maintain waterways and ports? Drop a comment with a fun fact! #UnitedDredging #DredgingLife #DidYouKnow","What's your favorite thing about working outdoors? Drop it in the comments — we'd love to hear from our crew and followers! #UnitedDredging #OutdoorWork #CrewLife","Tag someone who would love working on the water every day! #UnitedDredging #DredgingLife #JobsOnTheWater #TagAFriend","End of the month — what was your favorite United Dredging post this month? Let us know in the comments! #UnitedDredging #Community #MonthlyRecap","Quick poll: would you rather work on the water or on land? Tell us below! #UnitedDredging #WorkLife #DredgingLife","What does your ideal workday look like? Ours involves big equipment, open water, and an amazing team. Tell us yours! #UnitedDredging #WorkLife #CrewLife","Caption this photo! Drop yours below! #UnitedDredging #CaptionContest #DredgingLife","If you could work anywhere in the world on a dredging project, where would it be? #UnitedDredging #DredgingWorld","Coffee or energy drink to start your workday? Tell us what fuels the United Dredging crew! #UnitedDredging #WorkdayFuel #CrewLife","What's the hardest part of your job? Tell us yours in the comments! #UnitedDredging #HardestPart #WorkLife","If you had to describe United Dredging in 3 words, what would they be? Drop them below! #UnitedDredging #ThreeWords #CompanyCulture","Heavy equipment question: what's the most impressive machine you've ever seen in person? #UnitedDredging #HeavyEquipment #MachineryLovers","What career advice would you give your younger self? Share your wisdom! #UnitedDredging #CareerAdvice #WorkWisdom","True or false: dredging is one of the most important industries most people know nothing about. #UnitedDredging #TrueOrFalse #DredgingLife","What's your go-to song for a long day on the job site? Drop your playlist picks! #UnitedDredging #JobSitePlaylist #WorkMusic","Weekend plans? Our crew is always on the go — on and off the clock. Tell us what you've got planned! #UnitedDredging #WeekendVibes","What's something people always get wrong about working in construction or dredging? Set the record straight! #UnitedDredging #SetTheRecord #DredgingLife","If you could add one perk to your workplace, what would it be? Ours already comes with a paid Audible account! #UnitedDredging #WorkPerks","What does teamwork mean to you? For the United Dredging crew it means showing up for each other every single day. #UnitedDredging #Teamwork","Early bird or night owl? Our crew does both — early starts and late finishes on the water! What about you? #UnitedDredging #EarlyBird #NightOwl","What's your proudest work accomplishment? We love hearing about the wins — big and small! Share yours. #UnitedDredging #ProudMoment #WorkWin","If you could shadow any job at United Dredging for a day, which role would you pick and why? #UnitedDredging #ShadowADay #DredgingLife","What's the best piece of advice a coworker has ever given you? Drop your favorites! #UnitedDredging #CoworkerAdvice #WorkWisdom","What's your favorite season to work in and why? For our crew on the water, every season has its challenges! #UnitedDredging #FavoriteSeason","Fill in the blank: working at United Dredging means __________. We want to hear from our crew and followers! #UnitedDredging #FillInTheBlank"]},
+  {key:'hiring',label:'Hiring Post',day:2,color:'#037f4c',bg:'#e0f7ee',text:'#014d2e',platforms:['Facebook','Instagram','X'],captions:["We're growing and we want YOU on our team! United Dredging is hiring. If you're hardworking and reliable — apply today. Link in bio. #NowHiring #UnitedDredging #DredgingJobs #JoinOurTeam","A career you can be proud of starts here. United Dredging is looking for dedicated team members. Great pay, great perks, great people. Apply now — link in bio. #Hiring #UnitedDredging #NowHiring","We're hiring NOW! United Dredging has open positions and we're looking for the right people. Don't wait — apply today. Link in bio. #UnitedDredging #UrgentHiring #NowHiring","Know someone who'd be a great fit at United Dredging? Tag them below! We're always looking for hardworking people. #UnitedDredging #NowHiring #Referral #JoinOurCrew","Ready to build a real career? United Dredging is looking for motivated team members who want to grow with us. Link in bio! #UnitedDredging #Hiring #CareerOpportunity","Join the team that keeps waterways moving! United Dredging is hiring — apply today and let's build something great. Link in bio. #UnitedDredging #NowHiring #DredgingLife","We're not just hiring employees — we're building a family. Come join the United Dredging crew! Link in bio. #UnitedDredging #NowHiring #CompanyCulture","Opportunities like this don't come around often. United Dredging is hiring and we want the best. Apply now — link in bio. #UnitedDredging #Hiring #DredgingCareers","If you're looking for a company that invests in its people, look no further. United Dredging is hiring! Apply today. #UnitedDredging #InvestsInYou #NowHiring","United Dredging is expanding and we need great people to grow with us. Competitive pay, paid Audible, and an incredible team. Apply now! #UnitedDredging #Expanding #NowHiring","We hire for attitude and train for skill. If you're motivated and dependable — United Dredging wants you. Link in bio. #UnitedDredging #HireForAttitude #NowHiring","Dreaming of a hands-on career with a team that has your back? United Dredging is hiring! Link in bio. #UnitedDredging #HandsOnCareer #NowHiring","Your next career move starts here. United Dredging is looking for hard workers ready to make an impact. Apply today. #UnitedDredging #NextCareerMove #NowHiring","We take care of our team — and right now, our team is growing. United Dredging is hiring! Link in bio. #UnitedDredging #NowHiring #DredgingCareers","What if your job actually excited you every day? At United Dredging, it can. We're hiring — link in bio. #UnitedDredging #ExcitingWork #NowHiring","Good jobs are hard to find. Great jobs are even harder. United Dredging is offering great — apply now! #UnitedDredging #GreatJob #NowHiring","We're building something great at United Dredging — and we need great people to do it. Are you in? Link in bio! #UnitedDredging #BuildingSomethingGreat","Come work where your effort is noticed and your growth is supported. United Dredging is hiring — link in bio! #UnitedDredging #EffortNoticed #NowHiring","The right opportunity is out there — and it might be right here at United Dredging. We're hiring! Link in bio. #UnitedDredging #RightOpportunity","Looking for stability, good pay, and a team you'll enjoy? United Dredging is hiring — apply now. Link in bio. #UnitedDredging #Stability #NowHiring","We're proud of the culture we've built at United Dredging — and we want the right people to be part of it. Now hiring! #UnitedDredging #ProudCulture","Hard work deserves real rewards. At United Dredging, we make sure our team is taken care of. Now hiring — link in bio! #UnitedDredging #HardWorkRewarded","The United Dredging crew is one of a kind — and there's room for more! We're hiring. Link in bio. #UnitedDredging #OneOfAKind #NowHiring","Don't just look for a job — look for a career. United Dredging is hiring people who want to grow and make an impact. Apply today! #UnitedDredging #LookForACareer","Join a team that works hard, supports each other, and takes pride in every project. United Dredging is hiring — link in bio. #UnitedDredging #PartOfSomethingReal"]}
+];
+
+const SPECIAL_TYPES={
+  birthday:{label:'Birthday',color:'#e91e8c',bg:'#fce4f3',text:'#7b0044',platforms:['Facebook','Instagram'],
+    captionFn:(name,role)=>[
+      `Happy Birthday to our amazing ${role}, ${name}! We hope your day is as incredible as the work you bring to United Dredging every single day. Wishing you all the best! #UnitedDredging #HappyBirthday #TeamCelebration`,
+      `Wishing a very Happy Birthday to ${name} from the ${role} team! Thank you for everything you do — today is YOUR day. Celebrate big! #UnitedDredging #BirthdayShoutout #CrewLove`,
+      `It's ${name}'s birthday and the whole United Dredging family is celebrating! We're so grateful to have you on our team. Have an amazing day, ${name.split(' ')[0]}! #UnitedDredging #HappyBirthday #TeamAppreciation`,
+      `Happy Birthday ${name}! From everyone at United Dredging — thank you for your hard work, your dedication, and the energy you bring to our crew every day. Hope it's a great one! #UnitedDredging #BirthdayCelebration`,
+      `Shoutout to ${name} (${role}) on their birthday today! United Dredging wouldn't be the same without you. Wishing you a day full of joy and celebration! #UnitedDredging #HappyBirthday #TeamShoutout`,
+    ]},
+  anniversary:{label:'Work Anniversary',color:'#7c4dff',bg:'#ede7ff',text:'#3a007a',platforms:['Facebook','Instagram','X'],
+    captionFn:(name,years)=>[
+      `Today we celebrate ${name} and their ${years} year${years>1?'s':''} with United Dredging! Your dedication, loyalty, and hard work mean the world to us. Thank you for being part of our journey! #UnitedDredging #WorkAnniversary #TeamMilestone`,
+      `${years} year${years>1?'s':''} strong! Happy Work Anniversary to ${name} — a valued member of the United Dredging family. We're so grateful for everything you bring to our team. Here's to many more! #UnitedDredging #WorkAnniversary #Grateful`,
+      `Congratulations to ${name} on ${years} incredible year${years>1?'s':''} at United Dredging! Your commitment to our mission and your teammates has made a real impact. We're proud to have you! #UnitedDredging #Anniversary #TeamStrong`,
+      `${years} year${years>1?'s':''} at United Dredging — and we couldn't imagine the team without ${name}! Thank you for your loyalty, your heart, and everything you do every single day. Happy anniversary! #UnitedDredging #WorkAnniversary #TeamLove`,
+      `Happy Work Anniversary ${name}! ${years} year${years>1?'s':''} of showing up, working hard, and being an essential part of the United Dredging crew. We see you — and we appreciate you more than words can say! #UnitedDredging #MilestoneAlert #WorkAnniversary`,
+    ]},
+  corevalue:{label:'Core Value Nominee',color:'#00897b',bg:'#e0f2f1',text:'#004d40',platforms:['Facebook','Instagram','X'],
+    captionFn:(name,value)=>[
+      `Congratulations to our Core Value Nominee of the month — ${name}! They were recognized for demonstrating "${value}" in everything they do. This is what the United Dredging spirit looks like. We're proud of you! #UnitedDredging #CoreValues #EmployeeRecognition #${value.replace(/\s+/g,'')}`,
+      `This month's Core Value Nominee is ${name}, recognized for living out our value of "${value}" every single day. Your example inspires the whole team. Congratulations and THANK YOU! #UnitedDredging #CoreValueNominee #TeamRecognition`,
+      `We're proud to recognize ${name} as this month's Core Value Nominee for embodying "${value}"! At United Dredging, our values aren't just words — they're lived by people like ${name.split(' ')[0]} every day. Congratulations! #UnitedDredging #CoreValues #Recognition`,
+      `A huge congratulations to ${name} for being nominated as our Core Value champion for "${value}" this month! The way you show up for this team is truly inspiring. United Dredging is better because of you. #UnitedDredging #CoreValueNominee #ProudEmployer`,
+      `Spotlighting ${name} — this month's Core Value Nominee for "${value}"! Your commitment to this value sets the standard for our entire crew. Thank you for being an example worth following. #UnitedDredging #ValuesInAction #CoreValueNominee`,
+    ]}
+};
+
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+let curMonth=new Date().getMonth(),curYear=new Date().getFullYear();
+let captionOverrides=JSON.parse(localStorage.getItem('ud_captionOverrides')||'{}');
+let specialPosts=JSON.parse(localStorage.getItem('ud_specialPosts')||'{}');
+let _savedTypes=JSON.parse(localStorage.getItem('ud_activeTypes')||'null');
+let activeTypes=new Set(_savedTypes||TYPES.map(t=>t.key));
+let modalPost=null,modalIsSpecial=false;
+let currentAddType=null;
+function saveState(){
+  localStorage.setItem('ud_captionOverrides',JSON.stringify(captionOverrides));
+  localStorage.setItem('ud_specialPosts',JSON.stringify(specialPosts));
+  localStorage.setItem('ud_activeTypes',JSON.stringify([...activeTypes]));
+}
+
+function storageKey(year,month){return `${year}-${month}`;}
+function getSpecials(year,month){return specialPosts[storageKey(year,month)]||[];}
+function setSpecials(year,month,arr){specialPosts[storageKey(year,month)]=arr;}
+
+function getCapIdx(year,month,typeKey){
+  const k=`${year}-${month}-${typeKey}`;
+  if(captionOverrides[k]!==undefined)return captionOverrides[k];
+  return(year*12+month+TYPES.findIndex(t=>t.key===typeKey))%25;
+}
+
+function regenCaption(){
+  if(modalIsSpecial){
+    const specials=getSpecials(modalPost.year,modalPost.month);
+    const sp=specials.find(s=>s.id===modalPost.id);
+    if(!sp)return;
+    const st=SPECIAL_TYPES[sp.type];
+    const caps=st.captionFn(sp.name,sp.extra);
+    sp.capIdx=((sp.capIdx||0)+1)%caps.length;
+    setSpecials(modalPost.year,modalPost.month,specials);saveState();
+    document.getElementById('modal-caption').textContent=caps[sp.capIdx];
+    document.getElementById('cap-counter').textContent=`Caption ${sp.capIdx+1} of ${caps.length}`;
+    return;
+  }
+  const t=TYPES.find(x=>x.key===modalPost.typeKey);
+  const k=`${modalPost.year}-${modalPost.month}-${modalPost.typeKey}`;
+  captionOverrides[k]=((getCapIdx(modalPost.year,modalPost.month,modalPost.typeKey)+1)%t.captions.length);saveState();
+  document.getElementById('modal-caption').textContent=t.captions[captionOverrides[k]];
+  document.getElementById('cap-counter').textContent=`Caption ${captionOverrides[k]+1} of ${t.captions.length}`;
+  const b=document.getElementById('copy-btn');b.textContent='Copy caption';b.classList.remove('copied');
+}
+
+function copyCaption(){
+  navigator.clipboard.writeText(document.getElementById('modal-caption').textContent).then(()=>{
+    const b=document.getElementById('copy-btn');b.textContent='Copied!';b.classList.add('copied');
+    setTimeout(()=>{b.textContent='Copy caption';b.classList.remove('copied');},2000);
+  });
+}
+
+function deleteSpecial(){
+  if(!modalIsSpecial)return;
+  const specials=getSpecials(modalPost.year,modalPost.month).filter(s=>s.id!==modalPost.id);
+  setSpecials(modalPost.year,modalPost.month,specials);saveState();
+  document.getElementById('modal-bg').classList.remove('open');
+  renderCalendar();
+}
+
+function openCaptionModal(post,isSpecial){
+  modalPost=post;modalIsSpecial=isSpecial||false;
+  const delBtn=document.getElementById('del-btn');
+  const regenBtn=document.getElementById('regen-btn');
+  delBtn.style.display=isSpecial?'block':'none';
+  if(isSpecial){
+    const specials=getSpecials(post.year,post.month);
+    const sp=specials.find(s=>s.id===post.id);
+    const st=SPECIAL_TYPES[sp.type];
+    const caps=st.captionFn(sp.name,sp.extra);
+    const idx=sp.capIdx||0;
+    document.getElementById('modal-badge').textContent=st.label;
+    document.getElementById('modal-badge').style.background=st.bg;
+    document.getElementById('modal-badge').style.color=st.text;
+    document.getElementById('modal-title').textContent=sp.type==='birthday'?`Birthday: ${sp.name}`:sp.type==='anniversary'?`Anniversary: ${sp.name}`:`Core Value: ${sp.name}`;
+    document.getElementById('modal-date').textContent=post.dateStr;
+    document.getElementById('modal-caption').textContent=caps[idx];
+    document.getElementById('cap-counter').textContent=`Caption ${idx+1} of ${caps.length}`;
+    document.getElementById('modal-platforms').innerHTML=st.platforms.map(p=>`<span class="plat-chip">${p}</span>`).join('');
+  } else {
+    const t=TYPES.find(x=>x.key===post.typeKey);
+    const idx=getCapIdx(post.year,post.month,post.typeKey);
+    document.getElementById('modal-badge').textContent=t.label;
+    document.getElementById('modal-badge').style.background=t.bg;
+    document.getElementById('modal-badge').style.color=t.text;
+    document.getElementById('modal-title').textContent=t.label;
+    document.getElementById('modal-date').textContent=post.dateStr;
+    document.getElementById('modal-caption').textContent=t.captions[idx];
+    document.getElementById('cap-counter').textContent=`Caption ${idx+1} of ${t.captions.length}`;
+    document.getElementById('modal-platforms').innerHTML=t.platforms.map(p=>`<span class="plat-chip">${p}</span>`).join('');
+  }
+  const b=document.getElementById('copy-btn');b.textContent='Copy caption';b.classList.remove('copied');
+  document.getElementById('modal-bg').classList.add('open');
+  loadMediaForPost();
+}
+
+function closeCaptionModal(e){if(e.target===document.getElementById('modal-bg'))document.getElementById('modal-bg').classList.remove('open');}
+
+function openAddModal(type){
+  currentAddType=type;
+  const st=SPECIAL_TYPES[type];
+  document.getElementById('add-modal-badge').textContent=st.label;
+  document.getElementById('add-modal-badge').style.background=st.bg;
+  document.getElementById('add-modal-badge').style.color=st.text;
+  document.getElementById('add-modal-title').textContent=type==='birthday'?'Add a Birthday':type==='anniversary'?'Add a Work Anniversary':'Add a Core Value Nominee';
+  const body=document.getElementById('add-modal-body');
+  const monthName=MONTHS[curMonth];
+  if(type==='birthday'){
+    body.innerHTML=`
+      <div class="form-group"><label>Employee Name</label><input id="sp-name" type="text" placeholder="e.g. Sarah Johnson"></div>
+      <div class="form-group"><label>Department / Role</label><input id="sp-role" type="text" placeholder="e.g. Equipment Operator"></div>
+      <div class="form-group"><label>Birthday Date (in ${monthName})</label><input id="sp-day" type="number" min="1" max="31" placeholder="Day of month e.g. 14"></div>
+      <button class="submit-btn" onclick="submitSpecial()">Add Birthday Post</button>`;
+  } else if(type==='anniversary'){
+    body.innerHTML=`
+      <div class="form-group"><label>Employee Name</label><input id="sp-name" type="text" placeholder="e.g. Mike Torres"></div>
+      <div class="form-group"><label>Years of Service</label><input id="sp-years" type="number" min="1" max="50" placeholder="e.g. 5"></div>
+      <div class="form-group"><label>Anniversary Date (in ${monthName})</label><input id="sp-day" type="number" min="1" max="31" placeholder="Day of month e.g. 22"></div>
+      <button class="submit-btn" onclick="submitSpecial()">Add Anniversary Post</button>`;
+  } else {
+    body.innerHTML=`
+      <div class="form-group"><label>Nominee Name</label><input id="sp-name" type="text" placeholder="e.g. David Kim"></div>
+      <div class="form-group"><label>Core Value Demonstrated</label><input id="sp-value" type="text" placeholder="e.g. Integrity, Teamwork, Safety..."></div>
+      <div class="form-group"><label>Post Date (in ${monthName})</label><input id="sp-day" type="number" min="1" max="31" placeholder="Day of month e.g. 1"></div>
+      <button class="submit-btn" onclick="submitSpecial()">Add Core Value Post</button>`;
+  }
+  document.getElementById('add-modal-bg').classList.add('open');
+}
+
+function closeAddModal(e){if(e.target===document.getElementById('add-modal-bg'))document.getElementById('add-modal-bg').classList.remove('open');}
+
+function submitSpecial(){
+  const name=(document.getElementById('sp-name')||{}).value||'';
+  const day=parseInt((document.getElementById('sp-day')||{}).value||'0');
+  if(!name.trim()||!day||day<1||day>31){alert('Please fill in all fields.');return;}
+  let extra='';
+  if(currentAddType==='birthday') extra=(document.getElementById('sp-role')||{}).value||'Team Member';
+  else if(currentAddType==='anniversary') extra=(document.getElementById('sp-years')||{}).value||'1';
+  else extra=(document.getElementById('sp-value')||{}).value||'Excellence';
+  const d=new Date(curYear,curMonth,day);
+  const dateStr=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const newPost={id:Date.now(),type:currentAddType,name:name.trim(),extra:extra.trim(),day,dateStr,capIdx:0};
+  const arr=getSpecials(curYear,curMonth);
+  arr.push(newPost);
+  setSpecials(curYear,curMonth,arr);saveState();
+  document.getElementById('add-modal-bg').classList.remove('open');
+  renderCalendar();
+}
+
+function getFirstMonday(year,month){const d=new Date(year,month,1);while(d.getDay()!==1)d.setDate(d.getDate()+1);return d;}
+
+function buildPosts(year,month){
+  const fm=getFirstMonday(year,month),posts={};
+  for(let w=0;w<5;w++){
+    TYPES.forEach(t=>{
+      const d=new Date(fm);
+      d.setDate(fm.getDate()+w*7+(t.day===1?0:t.day===2?1:t.day===3?2:t.day===4?3:t.day===5?4:t.day===6?5:6));
+      if(d.getMonth()!==month)return;
+      const day=d.getDate();if(!posts[day])posts[day]=[];
+      posts[day].push({typeKey:t.key,dateStr:d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'}),year,month,day});
+    });
+  }
+  return posts;
+}
+
+function renderCalendar(){
+  const grid=document.getElementById('cal-grid');grid.innerHTML='';
+  document.getElementById('month-label').textContent=`${MONTHS[curMonth]} ${curYear}`;
+  const posts=buildPosts(curYear,curMonth);
+  const specials=getSpecials(curYear,curMonth);
+  specials.forEach(sp=>{
+    const day=sp.day;if(!posts[day])posts[day]=[];
+    posts[day].push({isSpecial:true,id:sp.id,typeKey:sp.type,dateStr:sp.dateStr,year:curYear,month:curMonth,day});
+  });
+  const firstDay=new Date(curYear,curMonth,1).getDay();
+  const daysInMonth=new Date(curYear,curMonth+1,0).getDate();
+  const today=new Date();
+  for(let i=0;i<firstDay;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
+  for(let d=1;d<=daysInMonth;d++){
+    const cell=document.createElement('div');
+    const isToday=today.getDate()===d&&today.getMonth()===curMonth&&today.getFullYear()===curYear;
+    cell.className='cal-day'+(isToday?' today':'');
+    cell.innerHTML=`<div class="day-num">${d}</div>`;
+    (posts[d]||[]).filter(p=>p.isSpecial||activeTypes.has(p.typeKey)).forEach(post=>{
+      const pill=document.createElement('div');pill.className='post-pill';
+      if(post.isSpecial){
+        const sp=specials.find(s=>s.id===post.id);
+        const st=SPECIAL_TYPES[sp.type];
+        pill.style.background=st.bg;
+        pill.innerHTML=`<div class="post-pill-label" style="color:${st.text}">${st.label}</div><div class="post-pill-sub" style="color:${st.text}">${sp.name}</div>`;
+        pill.onclick=()=>openCaptionModal(post,true);
+      } else {
+        const t=TYPES.find(x=>x.key===post.typeKey);
+        pill.style.background=t.bg;
+        pill.innerHTML=`<div class="post-pill-label" style="color:${t.text}">${t.label}</div><div class="post-pill-sub" style="color:${t.text}">${t.platforms.join(', ')}</div>`;
+        pill.onclick=()=>openCaptionModal(post,false);
+      }
+      cell.appendChild(pill);
+    });
+    grid.appendChild(cell);
+  }
+}
+
+function buildToggles(){
+  const bar=document.getElementById('toggles-bar'),leg=document.getElementById('legend');
+  TYPES.forEach(t=>{
+    const tog=document.createElement('span');
+    tog.className='tog on';tog.style.background=t.bg;tog.style.color=t.text;
+    tog.innerHTML=`<span class="dot"></span>${t.label}`;
+    if(!activeTypes.has(t.key)){tog.classList.remove('on');tog.classList.add('off');}
+    tog.onclick=()=>{
+      if(activeTypes.has(t.key)){activeTypes.delete(t.key);tog.classList.remove('on');tog.classList.add('off');}
+      else{activeTypes.add(t.key);tog.classList.add('on');tog.classList.remove('off');}
+      saveState();renderCalendar();
+    };
+    bar.appendChild(tog);
+    const li=document.createElement('div');li.className='leg-item';
+    li.innerHTML=`<div class="leg-dot" style="background:${t.color}"></div><span>${t.label}</span>`;
+    leg.appendChild(li);
+  });
+  Object.values(SPECIAL_TYPES).forEach(st=>{
+    const li=document.createElement('div');li.className='leg-item';
+    li.innerHTML=`<div class="leg-dot" style="background:${st.color}"></div><span>${st.label}</span>`;
+    leg.appendChild(li);
+  });
+}
+
+function changeMonth(dir){
+  curMonth+=dir;
+  if(curMonth>11){curMonth=0;curYear++;}
+  if(curMonth<0){curMonth=11;curYear--;}
+  renderCalendar();
+}
+
+buildToggles();renderCalendar();
+
+let mediaFiles=JSON.parse(localStorage.getItem('ud_mediaFiles')||'{}');
+function saveMedia(){try{localStorage.setItem('ud_mediaFiles',JSON.stringify(mediaFiles));}catch(e){console.warn('Media too large for localStorage, not saving:',e);}}
+
+function getMediaKey(post,isSpecial){
+  if(isSpecial)return `special-${post.id}`;
+  return `${post.year}-${post.month}-${post.day}-${post.typeKey}`;
+}
+
+function handleMediaUpload(e){
+  const files=Array.from(e.target.files);
+  if(!modalPost)return;
+  const key=getMediaKey(modalPost,modalIsSpecial);
+  if(!mediaFiles[key])mediaFiles[key]=[];
+  files.forEach(f=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      mediaFiles[key].push({name:f.name,type:f.type,dataUrl:ev.target.result});
+      saveMedia();renderMediaGrid(key);
+    };
+    reader.readAsDataURL(f);
+  });
+  e.target.value='';
+}
+
+function renderMediaGrid(key){
+  const grid=document.getElementById('media-grid');
+  const count=document.getElementById('media-count');
+  const dlBtn=document.getElementById('dl-btn');
+  const files=mediaFiles[key]||[];
+  grid.innerHTML='';
+  if(files.length===0){count.style.display='none';dlBtn.disabled=true;return;}
+  count.style.display='block';
+  count.textContent=`${files.length} file${files.length>1?'s':''} attached`;
+  dlBtn.disabled=false;
+  files.forEach((f,i)=>{
+    const cell=document.createElement('div');cell.className='media-thumb';
+    const isVideo=f.type.startsWith('video/');
+    if(isVideo){
+      cell.innerHTML=`<video src="${f.dataUrl}" style="width:100%;height:100%;object-fit:cover;"></video>`;
+    } else {
+      cell.innerHTML=`<img src="${f.dataUrl}" alt="${f.name}">`;
+    }
+    const del=document.createElement('button');
+    del.className='media-thumb-del';del.textContent='×';
+    del.onclick=(ev)=>{ev.stopPropagation();mediaFiles[key].splice(i,1);saveMedia();renderMediaGrid(key);};
+    cell.appendChild(del);
+    const name=document.createElement('div');name.className='media-filename';name.textContent=f.name;
+    cell.appendChild(name);
+    grid.appendChild(cell);
+  });
+}
+
+function loadMediaForPost(){
+  if(!modalPost)return;
+  const key=getMediaKey(modalPost,modalIsSpecial);
+  renderMediaGrid(key);
+}
+
+async function downloadPost(){
+  if(!modalPost)return;
+  const key=getMediaKey(modalPost,modalIsSpecial);
+  const files=mediaFiles[key]||[];
+  const caption=document.getElementById('modal-caption').textContent;
+  const title=document.getElementById('modal-title').textContent;
+  const dateStr=document.getElementById('modal-date').textContent;
+
+  if(typeof JSZip==='undefined'){alert('Loading download library... please try again in a moment.');return;}
+  const zip=new JSZip();
+  const folder=zip.folder(title.replace(/[^a-z0-9]/gi,'_').substring(0,40));
+  folder.file('caption.txt',`${title}\n${dateStr}\n\n${caption}`);
+  files.forEach((f,i)=>{
+    const ext=f.name.split('.').pop();
+    const base64=f.dataUrl.split(',')[1];
+    folder.file(`media_${i+1}_${f.name}`,base64,{base64:true});
+  });
+  const blob=await zip.generateAsync({type:'blob'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`UnitedDredging_${title.replace(/[^a-z0-9]/gi,'_').substring(0,40)}.zip`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+</script>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</html>
